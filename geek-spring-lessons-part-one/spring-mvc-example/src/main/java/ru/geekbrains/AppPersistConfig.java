@@ -26,7 +26,7 @@ public class AppPersistConfig {
         dataSource.setUrl("jdbc:mysql://localhost:3306/spring_mvc_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC");
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setPassword("Popkorn1");
         return dataSource;
     }
 

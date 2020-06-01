@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.geekbrains.persist.entity.User;
 import ru.geekbrains.service.UserService;
 
+import java.util.Optional;
+
 @RequestMapping("/user")
 @Controller
 public class UserController {
@@ -25,13 +27,22 @@ public class UserController {
         this.userService = userService;
     }
 
+
     @GetMapping
     public String userList(Model model,
-                           @RequestParam("minAge") Integer minAge,
-                           @RequestParam("maxAge") Integer maxAge) {
+                           @RequestParam("minAge") Optional<Integer> minAge,
+                           @RequestParam("maxAge") Optional<Integer> maxAge) {
         logger.info("User list. With minAge = {} and maxAge = {}", minAge, maxAge);
 
-        model.addAttribute("users", userService.filterByAge(minAge, maxAge));
+        if(!minAge.isPresent() && !maxAge.isPresent()){
+            model.addAttribute("users", userService.findAll());
+        }else if(minAge.isPresent() && !maxAge.isPresent()){
+            model.addAttribute("users", userService.filterByMinAge(minAge));
+        }else if(!minAge.isPresent() && maxAge.isPresent()){
+            model.addAttribute("users", userService.filterByMaxAge(maxAge));
+        }else{
+            model.addAttribute("users", userService.filterByAge(minAge, maxAge));
+        }
         return "users";
     }
 

@@ -105,11 +105,11 @@
                     <container>
                         <containerId>tomcat9x</containerId>
                         <type>installed</type>
-                        <home>/Users/macbook/Downloads/apache-tomcat-9.0.35</home>
+                        <home>D:/AllRep/apache-tomcat-9.0.35</home>
                     </container>
                     <configuration>
                         <type>existing</type>
-                        <home>/Users/macbook/Downloads/apache-tomcat-9.0.35</home>
+                        <home>D:/AllRep/apache-tomcat-9.0.35</home>
                     </configuration>
                 </configuration>
             </plugin>

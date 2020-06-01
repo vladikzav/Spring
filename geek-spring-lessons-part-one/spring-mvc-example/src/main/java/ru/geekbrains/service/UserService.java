@@ -1,7 +1,6 @@
 package ru.geekbrains.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.persist.entity.User;
@@ -25,8 +24,20 @@ public class UserService {
         return repository.findAll();
     }
 
-    public List<User> filterByAge(Integer minAge, Integer maxAge) {
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public List<User> filterByAge(Optional<Integer> minAge, Optional<Integer> maxAge) {
+
+        return repository.findByAgeBetween(minAge, maxAge);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> filterByMinAge(Optional<Integer> minAge) {
+        return repository.findByAgeGreaterThanEqual(minAge);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> filterByMaxAge(Optional<Integer> maxAge) {
+        return repository.findByAgeLessThanEqual(maxAge);
     }
 
     @Transactional
