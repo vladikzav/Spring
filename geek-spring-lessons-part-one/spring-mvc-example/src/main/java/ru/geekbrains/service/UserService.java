@@ -1,6 +1,8 @@
 package ru.geekbrains.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.persist.entity.User;
@@ -24,20 +26,23 @@ public class UserService {
         return repository.findAll();
     }
 
-    @Transactional(readOnly = true)
-    public List<User> filterByAge(Optional<Integer> minAge, Optional<Integer> maxAge) {
 
-        return repository.findByAgeBetween(minAge, maxAge);
-    }
+    public Page<User> filterByAge(Optional<Integer> minAge, Optional<Integer> maxAge, Optional<String> search, Pageable pageable) {
 
-    @Transactional(readOnly = true)
-    public List<User> filterByMinAge(Optional<Integer> minAge) {
-        return repository.findByAgeGreaterThanEqual(minAge);
-    }
+        if(search.isPresent()){
+            return repository.findByNameContaining(search, pageable);
+        }
 
-    @Transactional(readOnly = true)
-    public List<User> filterByMaxAge(Optional<Integer> maxAge) {
-        return repository.findByAgeLessThanEqual(maxAge);
+        if (!minAge.isPresent() && !maxAge.isPresent()) {
+            return repository.findAll(pageable);
+        }
+        if (minAge.isPresent() && !maxAge.isPresent()) {
+            return repository.findByAgeGreaterThanEqual(minAge, pageable);
+        }
+        if (minAge == null) {
+            return repository.findByAgeLessThanEqual(maxAge, pageable);
+        }
+        return repository.findByAgeBetween(minAge, maxAge, pageable);
     }
 
     @Transactional

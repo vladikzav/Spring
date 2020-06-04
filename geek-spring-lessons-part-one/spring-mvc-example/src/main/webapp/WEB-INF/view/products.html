@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
+    <!--search-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     <title>Product list</title>
 </head>
 
@@ -41,17 +43,32 @@
 
 <div class="container">
     <div class="row py-2">
-        <div class="col-12">
-            <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
+
+        <!--search-->
+        <div class="col-12 col-md-10 col-lg-8">
+            <form class="card card-sm">
+                <div class="card-body row no-gutters align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-search h4 text-body"></i>
+                    </div>
+                    <div class="col">
+                        <input class="form-control form-control-lg form-control-borderless" type="search" name="search" placeholder="Search by name" th:value="${param.search}">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-lg btn-success" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div class="col-12 mt-3">
+            <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
             <form>
                 <label for="minPrice">Min Price</label>
-                <input type="number" name="minPrice" id="minPrice"/>
+                <input type="number" name="minPrice" id="minPrice" th:value="${param.minPrice}"/>
 
                 <label for="maxPrice">Max Price</label>
-                <input type="number" name="maxPrice" id="maxPrice"/>
+                <input type="number" name="maxPrice" id="maxPrice" th:value="${param.maxPrice}"/>
 
                 <button class="btn btn-primary" type="submit">Filter</button>
             </form>
@@ -72,7 +89,7 @@
                 <tr hidden>
                     <td class="text-center" colspan="5">No data</td>
                 </tr>
-                <tr th:each="product : ${products}">
+                <tr th:if="${productPage.hasContent()}" th:each="product : ${productPage.content}">
                     <th scope="row" th:text="${product.id}">1</th>
                     <td th:text="${product.name}">Macbook pro 2015</td>
                     <td th:text="${product.description}">Apple laptop</td>
@@ -84,6 +101,35 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="col-12" th:if="${productPage.hasContent()}">
+            <nav aria-label="...">
+                <ul class="pagination">
+                    <li class="page-item"
+                        th:classappend="${!productPage.hasPrevious()} ? 'disabled'">
+
+                        <a class="page-link"
+                           th:href="@{/product(page=${prevPageNumber}, size=${productPage.size}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}" tabindex="-1">Previous</a>
+                    </li>
+
+                    <li th:each="num: ${#numbers.sequence(1, productPage.totalPages)}"
+                        th:classappend="${num == productPage.number + 1} ? 'active'"
+                        class="page-item">
+
+                        <a class="page-link"
+                           th:text="${num}"
+                           th:href="@{/product(page=${num}, size=${productPage.size}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}">1</a>
+                    </li>
+
+                    <li class="page-item"
+                        th:classappend="${!productPage.hasNext()} ? 'disabled'">
+
+                        <a class="page-link"
+                           th:href="@{/product(page=${nextPageNumber}, size=${productPage.size}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

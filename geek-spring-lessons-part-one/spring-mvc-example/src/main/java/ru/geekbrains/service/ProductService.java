@@ -1,6 +1,8 @@
 package ru.geekbrains.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.geekbrains.persist.entity.Product;
@@ -24,20 +26,23 @@ public class ProductService {
         return repository.findAll();
     }
 
-    @Transactional(readOnly = true)
-    public List<Product> filterByPrice(Optional<Integer> minPrice, Optional<Integer> maxPrice) {
 
-        return repository.findByPriceBetween(minPrice, maxPrice);
-    }
+    public Page<Product> filterByPrice(Optional<Integer> minPrice, Optional<Integer> maxPrice, Optional<String> search, Pageable pageable) {
 
-    @Transactional(readOnly = true)
-    public List<Product> filterByMinPrice(Optional<Integer> minPrice) {
-        return repository.findByPriceGreaterThanEqual(minPrice);
-    }
+        if(search.isPresent()){
+            return repository.findByNameContaining(search, pageable);
+        }
 
-    @Transactional(readOnly = true)
-    public List<Product> filterByMaxPrice(Optional<Integer> maxPrice) {
-        return repository.findByPriceLessThanEqual(maxPrice);
+        if (!minPrice.isPresent() && !maxPrice.isPresent()) {
+            return repository.findAll(pageable);
+        }
+        if (minPrice.isPresent() && !maxPrice.isPresent()) {
+            return repository.findByPriceGreaterThanEqual(minPrice, pageable);
+        }
+        if (minPrice == null) {
+            return repository.findByPriceLessThanEqual(maxPrice, pageable);
+        }
+        return repository.findByPriceBetween(minPrice, maxPrice, pageable);
     }
 
     @Transactional

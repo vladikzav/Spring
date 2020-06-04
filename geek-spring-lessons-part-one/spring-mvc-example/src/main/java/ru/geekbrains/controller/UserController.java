@@ -3,6 +3,8 @@ package ru.geekbrains.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,18 +33,18 @@ public class UserController {
     @GetMapping
     public String userList(Model model,
                            @RequestParam("minAge") Optional<Integer> minAge,
-                           @RequestParam("maxAge") Optional<Integer> maxAge) {
+                           @RequestParam("maxAge") Optional<Integer> maxAge,
+                           @RequestParam("page") Optional<Integer> page,
+                           @RequestParam("size") Optional<Integer> size,
+                           @RequestParam("search") Optional<String> search) {
         logger.info("User list. With minAge = {} and maxAge = {}", minAge, maxAge);
 
-        if(!minAge.isPresent() && !maxAge.isPresent()){
-            model.addAttribute("users", userService.findAll());
-        }else if(minAge.isPresent() && !maxAge.isPresent()){
-            model.addAttribute("users", userService.filterByMinAge(minAge));
-        }else if(!minAge.isPresent() && maxAge.isPresent()){
-            model.addAttribute("users", userService.filterByMaxAge(maxAge));
-        }else{
-            model.addAttribute("users", userService.filterByAge(minAge, maxAge));
-        }
+        Page<User> userPage = userService.filterByAge(minAge, maxAge, search,
+                PageRequest.of(page.orElse(1) - 1, size.orElse(5)));
+        model.addAttribute("usersPage", userPage);
+        model.addAttribute("prevPageNumber", userPage.hasPrevious() ? userPage.previousPageable().getPageNumber() + 1 : -1);
+        model.addAttribute("nextPageNumber", userPage.hasNext() ? userPage.nextPageable().getPageNumber() + 1 : -1);
+
         return "users";
     }
 
